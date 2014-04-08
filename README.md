@@ -44,7 +44,7 @@ On your website, load the plugin and its dependencies (jQuery & jQuery cookie) i
 Then, to load an XBlock in the `div.content` element for example:
 
 ```js
-$('.content .courseware-vertical').xblock({
+$('.courseware-content').xblock({
     usageId: 'i4x:;_;_TestX;_TST-BRGT;_vertical;_0c4f0ca3c3f54a1b8ad5d9830c1d16b0',
     sessionId: '89e5dd96180debc33b582969b88ec9ce',
     baseDomain: 'example.com',
@@ -53,3 +53,15 @@ $('.content .courseware-vertical').xblock({
 ```
 
 Note that you need to provide the usage id of the XBlock you want to load, and a valid user session id from the LMS.
+
+### Handling events
+
+When a user clicks on a `/jump_to_id` URL, used in courseware content to create links between courseware sections,
+jquery-xblock catches the click and emits an `xblock_jump` event, which you can monitor:
+
+```js
+$('.courseware-content').on('xblock_jump', function(event, course_id, block_type, block_id) {
+  // Here, load a new XBlock
+  // Likely the vertical containing the block referenced in the jump_to_id
+});
+```

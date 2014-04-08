@@ -107,6 +107,27 @@
             });
         },
 
+        eventsInit: function(options, root) {
+            // Catch jump_to_id URLs
+            $('a', root).not('.xblock-jump').each(function(index, linkDOM) {
+                var link_url = $(linkDOM).attr('href'),
+                    link_found = /^\/courses\/([^\/]+\/[^\/]+)\/([^\/]+)\/jump_to_id\/(.+)/.exec(link_url);
+
+                if (link_found) {
+                    var course_id = link_found[1],
+                        block_type = link_found[2],
+                        block_id = link_found[3];
+
+                    $(linkDOM).on('click', function(e) {
+                        e.preventDefault();
+                        console.log(course_id, block_type, block_id);
+                        $(linkDOM).trigger('xblock_jump', [course_id, block_type, block_id]);
+                    });
+                    $(linkDOM).addClass('xblock-jump');
+                }
+            });
+        },
+
         csrfSafeMethod: function(method) {
             // these HTTP methods do not require CSRF protection
             return (/^(GET|HEAD|OPTIONS|TRACE)$/.test(method));
@@ -181,6 +202,7 @@
 
                 $.when.apply($, deferreds).then(function() {
                     console.log('All XBlock resources successfully loaded');
+                    $this.eventsInit(options, root);
                     $this.jsInit(options, root);
                 });
 
