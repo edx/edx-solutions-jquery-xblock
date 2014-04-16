@@ -161,7 +161,7 @@
         },
 
         getLmsBaseURL: function(options) {
-            if (options.lmsSecureURL) {
+            if (options.lmsSecureURL || 'https:' === document.location.protocol) {
                 return 'https://' + this.getLmsDomain(options);
             } else {
                 return 'http://' + this.getLmsDomain(options);
