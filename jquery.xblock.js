@@ -240,8 +240,8 @@
                 url: blockURL,
                 dataType: 'json',
                 xhrFields: {
-                    withCredentials: true,
-                },
+                    withCredentials: true
+                }
             }).done(function(response) {
                 root.html(response.html);
 
@@ -252,7 +252,7 @@
                 });
 
                 $this.setAjaxCSRFToken(response.csrf_token, options, root);
-            }).error(function(response, text_status, error_msg) {
+            }).fail(function(response, text_status, error_msg) {
                 console.log('Error getting XBlock: ' + text_status);
                 console.log('Can be caused by a wrong session id, or missing CORS headers from the LMS');
             });
