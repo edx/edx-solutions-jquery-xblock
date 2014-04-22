@@ -67,6 +67,12 @@ describe('jquery-xblock', function() {
             expect($('.courseware-content .mentoring .xblock-answer')).to.have.length(1);
         });
 
+        it('called the xblock mentoring and answer init function', function() {
+            expect(
+                $('.courseware-content .mentoring .answer-checkmark').hasClass('checkmark-correct')
+            ).to.be.true;
+        });
+
         it('contains the xblock submit button', function() {
             expect($('.courseware-content .mentoring .submit')).to.have.length(1);
         });
