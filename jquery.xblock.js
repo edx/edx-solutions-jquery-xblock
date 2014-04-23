@@ -36,6 +36,34 @@
             lmsSecureURL: false, // Is the LMS on HTTPS?
         },
 
+        loadResources: function(resources, options, root) {
+            var $this = this,
+                numResources = resources.length,
+                deferred = $.Deferred(),
+                applyResource;
+
+            applyResource = function(index) {
+                var hash, resource, head, value, promise;
+
+                if (index >= numResources) {
+                    deferred.resolve();
+                    return;
+                }
+
+                value = resources[index];
+                hash = value[0];
+                resource = value[1];
+                $this.loadResource(hash, resource, options, root).done(function() {
+                    applyResource(index + 1);
+                }).fail(function() {
+                    deferred.reject();
+                });
+            };
+            applyResource(0);
+
+            return deferred;
+        },
+
         loadResource: function(resource_hash, resource, options, root) {
             var deferred = $.Deferred().resolve(), // By default, don't wait for the resource to load
                 resourceURL;
@@ -211,13 +239,9 @@
                     withCredentials: true,
                 },
             }).done(function(response) {
-                var deferreds = $.map(response.resources, function(resource) {
-                    return $this.loadResource(resource[0], resource[1], options, root);
-                })
-
                 root.html(response.html);
 
-                $.when.apply($, deferreds).then(function() {
+                $this.loadResources(response.resources, options, root).done(function() {
                     console.log('All XBlock resources successfully loaded');
                     $this.eventsInit(options, root);
                     $this.jsInit(options, root);
