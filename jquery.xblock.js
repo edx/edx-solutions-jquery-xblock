@@ -136,7 +136,7 @@
         setAjaxCSRFToken: function(csrftoken, options, root) {
             var $this = this;
 
-            $.cookie('csrftoken', csrftoken, { domain: '.' + options.baseDomain });
+            $.cookie('csrftoken', csrftoken, { domain: '.' + options.baseDomain, path: '/' });
             $.ajaxSetup({
                 xhrFields: {
                     withCredentials: true,
@@ -182,7 +182,7 @@
                 console.log('Error: You must provide a session id from the LMS (cf options)');
                 return;
             }
-            $.cookie('sessionid', options.sessionId, { domain: '.' + options.baseDomain });
+            $.cookie('sessionid', options.sessionId, { domain: '.' + options.baseDomain, path: '/' });
 
             // Avoid failing if the XBlock contains XModules
             window.setup_debug = function(){};
