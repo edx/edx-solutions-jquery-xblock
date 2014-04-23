@@ -36,12 +36,19 @@
             lmsSecureURL: false, // Is the LMS on HTTPS?
         },
 
-        loadResource: function(resource, options, root) {
-            console.log('Loading XBlock resource', resource);
+        loadResource: function(resource_hash, resource, options, root) {
+            var deferred = $.Deferred().resolve(), // By default, don't wait for the resource to load
+                resourceURL;
+
+            console.log('Loading XBlock resource', resource_hash, resource);
+
+            if (!this.register_resource_hash(resource_hash, options, root)) {
+                console.log('Ignoring already loaded XBlock resource', resource_hash, resource);
+                return deferred;
+            }
 
             if (resource.kind === 'url') {
-                var resourceURL = this.getLmsBaseURL(options) + resource.data,
-                    deferred = $.Deferred().resolve(); // By default, don't wait for the resource to load
+                resourceURL = this.getLmsBaseURL(options) + resource.data;
 
                 if (resource.mimetype === 'text/css') {
                     $('head').append('<link href="' + resourceURL + '" rel="stylesheet" />')
@@ -64,6 +71,16 @@
                 console.log('Unknown XBlock resource kind', resource.kind);
             }
             return deferred;
+        },
+
+        register_resource_hash: function(resource_hash, options, root) {
+            var loaded_resource_hashes = root.data('loaded_resource_hashes') || [];
+
+            if ($.inArray(resource_hash, loaded_resource_hashes) !== -1) {
+                return false;
+            }
+            loaded_resource_hashes.push(resource_hash);
+            return true;
         },
 
         getRuntime: function(options, root) {
@@ -195,7 +212,7 @@
                 },
             }).done(function(response) {
                 var deferreds = $.map(response.resources, function(resource) {
-                    return $this.loadResource(resource, options, root);
+                    return $this.loadResource(resource[0], resource[1], options, root);
                 })
 
                 root.html(response.html);
