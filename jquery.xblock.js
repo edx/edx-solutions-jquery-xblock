@@ -76,7 +76,11 @@
             }
 
             if (resource.kind === 'url') {
-                resourceURL = resource.data;
+                resourceURL = resource.data; // By default, the resource url contains the SITENAME
+
+                if (!resource.data.match(/^\/\//) && !resource.data.match(/^(http|https):\/\//)) {
+                    resourceURL = this.getLmsBaseURL(options) + resource.data;
+                }
 
                 if (resource.mimetype === 'text/css') {
                     $('head').append('<link href="' + resourceURL + '" rel="stylesheet" />')
