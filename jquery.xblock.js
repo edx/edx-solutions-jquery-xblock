@@ -76,7 +76,11 @@
             }
 
             if (resource.kind === 'url') {
-                resourceURL = this.getLmsBaseURL(options) + resource.data;
+                resourceURL = resource.data; // By default, the resource url contains the SITENAME
+
+                if (!resource.data.match(/^\/\//) && !resource.data.match(/^(http|https):\/\//)) {
+                    resourceURL = this.getLmsBaseURL(options) + resource.data;
+                }
 
                 if (resource.mimetype === 'text/css') {
                     $('head').append('<link href="' + resourceURL + '" rel="stylesheet" />')
@@ -120,7 +124,7 @@
                         courseId = $(element).data('course-id'),
                         lmsBaseURL = $this.getLmsBaseURL(options);
 
-                    return (lmsBaseURL + '/courses/' + courseId + '/xblock/' + usageId + 
+                    return (lmsBaseURL + '/courses/' + courseId + '/xblock/' + usageId +
                             '/handler/' + handlerName);
                 },
             };
