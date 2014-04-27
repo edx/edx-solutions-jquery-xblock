@@ -17,6 +17,7 @@
         "karma-chai": "0.1.0",
         "karma-jquery": "0.1.0",
         "karma-sinon-chai": "0.1.5",
-        "karma-coverage": "0.2.1"
+        "karma-coverage": "0.2.1",
+        "karma-html2js-preprocessor": "~0.1"
     }
 }

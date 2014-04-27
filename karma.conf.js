@@ -17,8 +17,7 @@ module.exports = function(config) {
             'http://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.0/jquery.cookie.min.js',
             'jquery.xblock.js',
             'test/underscore-min.js',
-            'test/fixtures/resources.js', // javascript resources mock
-            'test/fixtures/xblock.js',
+            'test/fixtures/*.js',
             'test/test.jquery-xblock.js'
         ],
 
@@ -27,11 +26,12 @@ module.exports = function(config) {
 
         ],
 
-
         // preprocess matching files before serving them to the browser
         // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
         preprocessors: {
-            'jquery.xblock.js': 'coverage'
+            'jquery.xblock.js': ['coverage'],
+            'test/fixtures/mentoring.js': ['html2js'],
+            'test/fixtures/answer.js': ['html2js']
         },
 
         // test results reporter to use

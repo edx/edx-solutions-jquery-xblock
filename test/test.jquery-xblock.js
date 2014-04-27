@@ -22,14 +22,18 @@ describe('jquery-xblock', function() {
             else if (options.url.match(/view\/student_view$/)) {
                 deferred.resolveWith(null, [XBlockData.getMentoringAnswer()]);
             }
-            else if (options.url.match(/answer.js$/) ||
-                     options.url.match(/mentoring.js$/) ||
-                     options.url.match(/underscore-min.js$/)) {
-                /* already loaded with test */
+            else if (options.url.match(/mentoring.js$/)) {
+                $.globalEval(window.__html__['test/fixtures/mentoring.js']);
                 deferred.resolve();
             }
-            else if (options.url.match(/handler\/view$/)) {
-                deferred.resolveWith(null, [XBlockData.getMentoringHtml()]);
+            else if (options.url.match(/answer.js$/)) {
+                $.globalEval(window.__html__['test/fixtures/answer.js']);
+                deferred.resolve();
+            }
+            else if (options.url.match(/underscore-min.js$/)) {
+                /* This is not currently as mocking since there was some issues with
+                 * $.globalEval(). Loaded directly with karma. */
+                deferred.resolve();
             }
 
             return deferred;

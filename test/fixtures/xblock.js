@@ -29,13 +29,7 @@ var XBLOCK_MENTORING_ANSWER = {
   ]
 };
 
-var XBLOCK_MENTORING_HTML = {"html": "<div class=\"mentoring\">\n  <div class=\"missing-dependency warning\" data-missing=\"False\">\n    You need to complete <a href=\"False\">the previous step</a> before\n    attempting this step.\n  </div>\n  \n  <div class=\"xblock-light-child\" name=\"None_0\" data-type=\"HTMLBlock\"><div>\n        <p>What is your goal?</p>\n    </div>\n\n    </div>\n  \n  <div class=\"xblock-light-child\" name=\"goal\" data-type=\"AnswerBlock\"><div class=\"xblock-answer\" data-completed=\"True\">\n  <textarea\n     class=\"answer editable\" cols=\"50\" rows=\"10\" name=\"input\"\n     data-min_characters=\"0\"\n     >dsaa</textarea>\n  <span class=\"answer-checkmark icon-2x\"></span>\n</div>\n</div>\n  \n  \n  <div class=\"attempts\" data-max_attempts=\"0\" data-num_attempts=\"0\"></div>\n  <div class=\"submit\">\n    <input type=\"button\" class=\"input-main\" value=\"Submit\"></input>\n  </div>\n  \n  <div class=\"messages\"></div>\n</div>\n"};
-
 var XBlockData = {
-    getMentoringHtml: function() {
-        return XBLOCK_MENTORING_HTML;
-    },
-
     getMentoringAnswer: function() {
         return XBLOCK_MENTORING_ANSWER;
     }

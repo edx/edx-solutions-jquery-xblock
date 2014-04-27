@@ -1,4 +1,3 @@
-// Mininum fixture for the test case. Initialization stuff have been preserved.
 function MentoringBlock(runtime, element) {
     var children;
 
@@ -43,17 +42,4 @@ function MentoringBlock(runtime, element) {
     }
 
     initXBlock();
-}
-
-function AnswerBlock(runtime, element) {
-    return {
-
-        init: function(options) {
-            var checkmark = $('.answer-checkmark', element);
-            var completed = $('.xblock-answer', element).data('completed');
-            if (completed === 'True') {
-                checkmark.addClass('checkmark-correct icon-ok fa-check');
-            }
-        }
-    }
 }
