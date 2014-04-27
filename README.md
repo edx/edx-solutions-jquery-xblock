@@ -79,18 +79,12 @@ The test environment uses Karma + Chrome.
    npm install
    ```
 
-3. Install karma globally on the system
-
-   ```sh
-   sudo npm install -g karma-cli
-   ```
-
 #### Run
 
 1. Run tests
 
    ```sh
-   karma start
+   make test
    ```
 
 2. The coverage report is in the *coverage* folder. ie: coverage/Chrome\ 33.0.1750\ \(Linux\)/index.html
