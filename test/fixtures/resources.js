@@ -30,9 +30,13 @@ function MentoringBlock(runtime, element) {
     }
 
     function initXBlock() {
-        // init children (especially mrq blocks)
-        var children = getChildren(element);
+        var submit_dom = $(element).find('.submit .input-main');
+        submit_dom.bind('click', function() {
+            var handlerUrl = runtime.handlerUrl(element, 'submit');
+            $.post(handlerUrl);
+        });
 
+        var children = getChildren(element);
         _.each(children, function(child) {
             callIfExists(child, 'init');
         });

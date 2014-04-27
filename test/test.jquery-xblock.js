@@ -34,6 +34,14 @@ describe('jquery-xblock', function() {
 
             return deferred;
         });
+
+        sinon.stub($, 'post', function(options) {
+            var deferred =  new $.Deferred();
+            var promise = deferred.promise()
+            deferred.resolve({});
+
+            return promise;
+        });
     });
 
     after(function() {
@@ -75,6 +83,13 @@ describe('jquery-xblock', function() {
 
         it('contains the xblock submit button', function() {
             expect($('.courseware-content .mentoring .submit')).to.have.length(1);
+        });
+
+        it('can call xblock submit button', function() {
+            expect($.post.calledWithMatch(/handler\/submit$/)).to.be.false;
+            $('.courseware-content .mentoring .submit .input-main').click();
+            expect($.post.called).to.be.true;
+            expect($.post.calledWithMatch(/handler\/submit$/)).to.be.true;
         });
 
         after(function() {
