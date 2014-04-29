@@ -34,8 +34,8 @@ On your website, load the plugin and its dependencies (jQuery & jQuery cookie) i
   </head>
   <body>
     <div>
-      <h1>My amazing XBlock</h2>
-      <div class="content"></div>
+      <h1>My amazing XBlock</h1>
+      <div class="courseware-content"></div>
     </div>
   </body>
 </html>
@@ -65,3 +65,26 @@ $('.courseware-content').on('xblock_jump', function(event, course_id, block_type
   // Likely the vertical containing the block referenced in the jump_to_id
 });
 ```
+
+### Tests
+
+#### Setup
+
+The test environment uses Karma + Chrome.
+
+1. Make sure you have nodeJS and npm installed on your system.
+2. Install tests dependencies.
+
+   ```sh
+   npm install
+   ```
+
+#### Run
+
+1. Run tests
+
+   ```sh
+   make test
+   ```
+
+2. The coverage report is in the *coverage* folder. ie: coverage/Chrome\ 33.0.1750\ \(Linux\)/index.html
