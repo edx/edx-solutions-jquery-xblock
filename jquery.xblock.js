@@ -93,7 +93,7 @@
                 if (resource.mimetype === 'text/css') {
                     $('head').append('<style type="text/css">' + resource.data + '</style>');
                 } else if (resource.mimetype === 'application/javascript') {
-                    deferred = $.globalEval(resource.data);
+                    $.globalEval(resource.data);
                 } else if (resource.mimetype === 'text/html') {
                     $('head').append(resource.data);
                 } else {
