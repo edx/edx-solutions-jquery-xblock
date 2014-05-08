@@ -194,6 +194,8 @@
                     var queryDomain = $('<a>').prop('href', settings.url).prop('hostname'),
                         lmsDomain = $this.getLmsDomain(options);
 
+                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+
                     if (!$this.csrfSafeMethod(settings.type) && queryDomain === lmsDomain) {
                         xhr.setRequestHeader("X-CSRFToken", csrftoken);
                     }
