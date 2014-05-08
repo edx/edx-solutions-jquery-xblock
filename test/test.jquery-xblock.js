@@ -3,6 +3,8 @@ var expect = chai.expect;
 describe('jquery-xblock', function() {
 
     before(function() {
+        var ajaxOptions = {}; // global ajax setup
+
         // Append our xblock div
         $('body').append("<div id='jquery-xblock-test'>"
                         + "<h1>My amazing XBlock</h1>"
@@ -10,10 +12,28 @@ describe('jquery-xblock', function() {
                         + "</div>");
 
         // setup our ajax stub
+        sinon.stub($, 'ajaxSetup', function(options) {
+            ajaxOptions = options;
+        });
+
         sinon.stub($, 'ajax', function(options) {
+            sinon.useFakeXMLHttpRequest();
+            var req = new XMLHttpRequest();
+
             var deferred =  new $.Deferred();
             var validUsageId = 'i4x:;_;_edX;_Open_DemoX;_mentoring;_d66b5ffbb8a44f93b0b832c1ec25007c';
             var usageId = options.url.match(/(i4x[^/]+)/);
+
+            // call the beforeSend function if specified
+            if (ajaxOptions.beforeSend) {
+                var opts = {
+                    url: options.url,
+                    type: options.type ? options.type : 'GET'
+                }
+
+                req.open(opts.type, opts.url);
+                ajaxOptions.beforeSend(req, opts);
+            }
 
             if (usageId && usageId[0] !== validUsageId) { // simulate a bad url
                 // TODO: this doesn't seem to call the fail callback...
@@ -34,6 +54,8 @@ describe('jquery-xblock', function() {
                 /* This is not currently as mocking since there was some issues with
                  * $.globalEval(). Loaded directly with karma. */
                 deferred.resolve();
+            } else if (options.url.match(/testHeader$/)) {
+                deferred.resolveWith(null, [{headers: req.requestHeaders}]);
             }
 
             return deferred;
@@ -65,6 +87,14 @@ describe('jquery-xblock', function() {
 
         it('loaded xblock through ajax', function() {
             expect($.ajax.called).to.be.true;
+        });
+
+        it('has the X-Requested-With header for cross origin request', function() {
+            $.ajax({
+                url: '/i4x:;_;_edX;_Open_DemoX;_mentoring;_d66b5ffbb8a44f93b0b832c1ec25007c/testHeader'
+            }).done(function(data) {
+                expect(data).to.have.deep.property('headers.X-Requested-With').and.to.equal('XMLHttpRequest');
+            });
         });
 
         it('loaded the xblock student view properly', function() {
