@@ -28,6 +28,7 @@
         location: location,
 
         default_options: {
+            courseId: null,      // [Mandatory] The course id of the XBlock to display
             usageId: null,       // [Mandatory] The usage id of the XBlock to display
             sessionId: null,     // [Mandatory] User session id from the LMS
             baseDomain: null,    // Common part of the client & LMS domain names
@@ -203,10 +204,6 @@
             });
         },
 
-        getCourseId: function(options) {
-            return options.usageId.substr(8).replace(/(.+);_(.+);_(.+);_.+/, '$1/$2/$3');
-        },
-
         getLmsDomain: function(options) {
             return options.lmsSubDomain + '.' + options.baseDomain;
         },
@@ -220,7 +217,7 @@
         },
 
         getViewUrl: function(viewName, options) {
-            return (this.getLmsBaseURL(options) + '/courses/' + this.getCourseId(options) +
+            return (this.getLmsBaseURL(options) + '/courses/' + options.courseId +
                     '/xblock/' + options.usageId + '/view/' + viewName)
         },
 
