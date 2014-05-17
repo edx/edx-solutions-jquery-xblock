@@ -45,6 +45,7 @@ Then, to load an XBlock in the `div.content` element for example:
 
 ```js
 $('.courseware-content').xblock({
+    courseId: 'TestX/TST-BRGT/2015-12',
     usageId: 'i4x:;_;_TestX;_TST-BRGT;_vertical;_0c4f0ca3c3f54a1b8ad5d9830c1d16b0',
     sessionId: '89e5dd96180debc33b582969b88ec9ce',
     baseDomain: 'example.com',

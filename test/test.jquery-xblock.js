@@ -35,7 +35,10 @@ describe('jquery-xblock', function() {
                 ajaxOptions.beforeSend(req, opts);
             }
 
-            if (usageId && usageId[0] !== validUsageId) { // simulate a bad url
+            if (options.url.match(/\/null\//)) { // no course id?
+                deferred.reject();
+            }
+            else if (usageId && usageId[0] !== validUsageId) { // simulate a bad usageId
                 // TODO: this doesn't seem to call the fail callback...
                 deferred.reject();
             }
@@ -78,11 +81,16 @@ describe('jquery-xblock', function() {
 
         before(function() {
             $('.courseware-content').xblock({
+                courseId: 'edX/Open_DemoX/edx_demo_course',
                 usageId: 'i4x:;_;_edX;_Open_DemoX;_mentoring;_d66b5ffbb8a44f93b0b832c1ec25007c',
                 sessionId: '37af0d2122b87150e69fecb8122eebe2',
                 baseDomain: 'localhost',
                 lmsSubDomain: 'lms'
             });
+        });
+
+        it('loaded xblock through ajax', function() {
+            expect($.ajax.called).to.be.true;
         });
 
         it('loaded xblock through ajax', function() {
@@ -127,7 +135,7 @@ describe('jquery-xblock', function() {
         });
 
         after(function() {
-            $('.courseware-content').remove();
+            $('.courseware-content').empty();
         });
     });
 
@@ -135,7 +143,27 @@ describe('jquery-xblock', function() {
 
         before(function() {
             $('.courseware-content').xblock({
+                courseId: 'edX/Open_DemoX/edx_demo_course',
                 usageId: 'i4x:;_;_edX;_Open_DemoX;_mentoring;_invalid_xblock',
+                sessionId: '37af0d2122b87150e69fecb8122eebe2',
+                baseDomain: 'localhost',
+                lmsSubDomain: 'lms'
+            });
+
+        });
+
+        it("hasn't loaded any xblock", function() {
+            expect($('.courseware-content .xblock')).to.have.length(0);
+        });
+
+    });
+
+    describe('no-course-id', function() {
+
+        before(function() {
+            $('.courseware-content').xblock({
+                usageId: 'i4x:;_;_edX;_Open_DemoX;_mentoring;_d66b5ffbb8a44f93b0b832c1ec25007c',
+                sessionId: '37af0d2122b87150e69fecb8122eebe2',
                 baseDomain: 'localhost',
                 lmsSubDomain: 'lms'
             });
@@ -151,6 +179,7 @@ describe('jquery-xblock', function() {
 
         before(function() {
             $('.courseware-content').xblock({
+                courseId: 'edX/Open_DemoX/edx_demo_course',
                 usageId: 'i4x:;_;_edX;_Open_DemoX;_mentoring;_d66b5ffbb8a44f93b0b832c1ec25007c'
             });
         });
