@@ -242,9 +242,10 @@
                     withCredentials: true
                 }
             }).done(function(response) {
+                root.html(response.html);
+
                 $this.loadResources(response.resources, options, root).done(function() {
                     console.log('All XBlock resources successfully loaded');
-                    root.html(response.html);
                     $this.eventsInit(options, root);
                     $this.jsInit(options, root);
                 });
