@@ -223,6 +223,7 @@
 
         init: function(options, root) {
             var $this = this,
+                deferred = $.Deferred();
                 blockURL = this.getViewUrl('student_view', options);
 
             // Set the LMS session cookie on the shared domain to authenticate on the LMS
@@ -248,13 +249,17 @@
                     console.log('All XBlock resources successfully loaded');
                     $this.eventsInit(options, root);
                     $this.jsInit(options, root);
+                    deferred.resolve();
                 });
 
                 $this.setAjaxCSRFToken(response.csrf_token, options, root);
             }).fail(function(response, text_status, error_msg) {
                 console.log('Error getting XBlock: ' + text_status);
                 console.log('Can be caused by a wrong session id, or missing CORS headers from the LMS');
+                deferred.reject();
             });
+
+            return deferred.promise();
         },
 
         bootstrap: function(options, root) {
@@ -264,13 +269,13 @@
                 options.baseDomain = this.location.host;
             }
 
-            this.init(options, root);
+            return this.init(options, root);
         },
     };
 
     $.fn.xblock = function(options) {
-        return this.each(function() {
-            $.xblock.bootstrap(options, $(this));
+        return this.map(function() {
+            return $.xblock.bootstrap(options, $(this));
         });
     };
 
