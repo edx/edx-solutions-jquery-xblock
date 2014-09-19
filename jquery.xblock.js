@@ -35,6 +35,8 @@
                                  // (eg: `example.com`, defaults to current domain)
             lmsSubDomain: 'lms', // The subdomain part for the LMS (eg, `lms` for `lms.example.com`)
             lmsSecureURL: false, // Is the LMS on HTTPS?
+            useCurrentHost: false, // set to true to load xblock using the current location.hostname
+            data: {}              // additional data to send to student_view. send as GET parameters
         },
 
         loadResources: function(resources, options, root) {
@@ -186,26 +188,35 @@
         setAjaxCSRFToken: function(csrftoken, options, root) {
             var $this = this;
 
-            $.cookie('csrftoken', csrftoken, $this.getCookieOptions(options));
+            if (!options.useCurrentHost) {
+                $.cookie('csrftoken', csrftoken, $this.getCookieOptions(options));
+            }
             $.ajaxSetup({
                 xhrFields: {
                     withCredentials: true,
                 },
                 beforeSend: function(xhr, settings) {
-                    var queryDomain = $('<a>').prop('href', settings.url).prop('hostname'),
-                        lmsDomain = $this.getLmsDomain(options);
+                    if (!options.useCurrentHost) {
+                        var queryDomain = $('<a>').prop('href', settings.url).prop('hostname'),
+                            lmsDomain = $this.getLmsDomain(options);
 
-                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+                        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
-                    if (!$this.csrfSafeMethod(settings.type) && queryDomain === lmsDomain) {
-                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                        if (!$this.csrfSafeMethod(settings.type) && queryDomain === lmsDomain) {
+                            xhr.setRequestHeader("X-CSRFToken", csrftoken);
+                        }
                     }
                 }
             });
         },
 
         getLmsDomain: function(options) {
-            return options.lmsSubDomain + '.' + options.baseDomain;
+            if (options.useCurrentHost) {
+                return this.location.hostname + ':' + this.location.port;
+            }
+            else {
+                return options.lmsSubDomain + '.' + options.baseDomain;
+            }
         },
 
         getLmsBaseURL: function(options) {
@@ -236,11 +247,14 @@
                 blockURL = this.getViewUrl('student_view', options);
 
             // Set the LMS session cookie on the shared domain to authenticate on the LMS
-            if (!options.sessionId) {
+            if (!options.sessionId && !options.useCurrentHost) {
                 console.log('Error: You must provide a session id from the LMS (cf options)');
                 return;
             }
-            $.cookie('sessionid', options.sessionId, $this.getCookieOptions(options));
+
+            if (!options.useCurrentHost) {
+                $.cookie('sessionid', options.sessionId, $this.getCookieOptions(options));
+            }
 
             // Avoid failing if the XBlock contains XModules
             window.setup_debug = function(){};
@@ -248,6 +262,7 @@
             $.ajax({
                 url: blockURL,
                 dataType: 'json',
+                data: options.data,
                 xhrFields: {
                     withCredentials: true
                 }

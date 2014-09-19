@@ -55,6 +55,17 @@ $('.courseware-content').xblock({
 
 Note that you need to provide the usage id of the XBlock you want to load, and a valid user session id from the LMS.
 
+If you are using jquery.xblock in the same environment/host than the LMS, you can use the useCurrentHost
+option, which simplify the usage. Example:
+
+```js
+$('.courseware-content').xblock({
+    courseId: 'TestX/TST-BRGT/2015-12',
+    usageId: 'i4x:;_;_TestX;_TST-BRGT;_vertical;_0c4f0ca3c3f54a1b8ad5d9830c1d16b0',
+    useCurrentHost: true,
+});
+```
+
 ### Handling events
 
 When a user clicks on a `/jump_to_id` URL, used in courseware content to create links between courseware sections,
@@ -89,3 +100,7 @@ The test environment uses Karma + Chrome.
    ```
 
 2. The coverage report is in the *coverage* folder. ie: coverage/Chrome\ 33.0.1750\ \(Linux\)/index.html
+
+#### TODO
+
+- Add Test for useCurrentHost.
