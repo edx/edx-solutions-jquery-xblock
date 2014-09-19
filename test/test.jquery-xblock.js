@@ -2,6 +2,29 @@ var expect = chai.expect;
 
 describe('jquery-xblock', function() {
 
+    const VALID_MENTORING_USAGE_ID = 'i4x:;_;_edX;_Open_DemoX;_mentoring;_d66b5ffbb8a44f93b0b832c1ec25007c';
+    const VALID_LINKS_USAGE_ID = 'i4x:;_;_edX;_Open_DemoX;_mentoring;_399b159119dd4feb87e69800ba2ce113';
+
+    function getDefaultConfig(transform_config){
+        var config = {
+            courseId: 'edX/Open_DemoX/edx_demo_course',
+            usageId: VALID_MENTORING_USAGE_ID,
+            sessionId: '37af0d2122b87150e69fecb8122eebe2',
+            baseDomain: 'localhost',
+            lmsSubDomain: 'lms'
+        };
+        if (transform_config)
+            transform_config(config);
+        return config;
+    }
+
+    function getAnswerForUsageId(usage_id){
+        if (usage_id === VALID_MENTORING_USAGE_ID)
+            return XBLOCK_MENTORING_ANSWER;
+        else if (usage_id === VALID_LINKS_USAGE_ID)
+            return XBLOCK_LINKS_ANSWER;
+    }
+
     before(function() {
         var ajaxOptions = {}; // global ajax setup
 
@@ -21,7 +44,7 @@ describe('jquery-xblock', function() {
             var req = new XMLHttpRequest();
 
             var deferred =  new $.Deferred();
-            var validUsageId = 'i4x:;_;_edX;_Open_DemoX;_mentoring;_d66b5ffbb8a44f93b0b832c1ec25007c';
+
             var usageId = options.url.match(/(i4x[^/]+)/);
 
             // call the beforeSend function if specified
@@ -38,12 +61,14 @@ describe('jquery-xblock', function() {
             if (options.url.match(/\/null\//)) { // no course id?
                 deferred.reject();
             }
-            else if (usageId && usageId[0] !== validUsageId) { // simulate a bad usageId
+            // simulate a bad usageId
+            else if (usageId && usageId[0] !== VALID_MENTORING_USAGE_ID && usageId[0] !== VALID_LINKS_USAGE_ID) {
                 // TODO: this doesn't seem to call the fail callback...
                 deferred.reject();
             }
             else if (options.url.match(/view\/student_view$/)) {
-                deferred.resolveWith(null, [XBlockData.getMentoringAnswer()]);
+                var target_usage_id = usageId ? usageId[0] : VALID_MENTORING_USAGE_ID;
+                deferred.resolveWith(null, [getAnswerForUsageId(target_usage_id)]);
             }
             else if (options.url.match(/mentoring.js$/)) {
                 $.globalEval(window.__html__['test/fixtures/mentoring.js']);
@@ -75,18 +100,12 @@ describe('jquery-xblock', function() {
 
     after(function() {
         $.ajax.restore();
-    })
+    });
 
     describe('valid-xblock', function() {
 
         before(function() {
-            $('.courseware-content').xblock({
-                courseId: 'edX/Open_DemoX/edx_demo_course',
-                usageId: 'i4x:;_;_edX;_Open_DemoX;_mentoring;_d66b5ffbb8a44f93b0b832c1ec25007c',
-                sessionId: '37af0d2122b87150e69fecb8122eebe2',
-                baseDomain: 'localhost',
-                lmsSubDomain: 'lms'
-            });
+            $('.courseware-content').xblock(getDefaultConfig());
         });
 
         it('loaded xblock through ajax', function() {
@@ -99,7 +118,7 @@ describe('jquery-xblock', function() {
 
         it('has the X-Requested-With header for cross origin request', function() {
             $.ajax({
-                url: '/i4x:;_;_edX;_Open_DemoX;_mentoring;_d66b5ffbb8a44f93b0b832c1ec25007c/testHeader'
+                url: VALID_MENTORING_USAGE_ID+'/testHeader'
             }).done(function(data) {
                 expect(data).to.have.deep.property('headers.X-Requested-With').and.to.equal('XMLHttpRequest');
             });
@@ -139,16 +158,50 @@ describe('jquery-xblock', function() {
         });
     });
 
+    describe('valid-xblock-links', function() {
+        before(function() {
+            $('.courseware-content').xblock(getDefaultConfig(function(config){
+                config.usageId = VALID_LINKS_USAGE_ID;
+            }));
+        });
+
+        it('should process jump_to link', function() {
+            var linkDom = $('#jump_to_link');
+            expect(linkDom).to.have.length(1);
+            expect(linkDom.hasClass('xblock-jump')).to.be.true;
+            var spy = sinon.spy(linkDom, 'trigger');
+            linkDom.click();
+            spy.calledWithExactly('xblock_jump',[
+                'edX/Open_DemoX',
+                'edx_demo_course',
+                'location://edX/Open_DemoX/edx_demo_course/vertical/38751697369040e39ec1d0403efbac96'
+            ]);
+        });
+
+        it('should process jump_to_id link', function() {
+            var linkDom = $('#jump_to_id_link');
+            expect(linkDom).to.have.length(1);
+            expect(linkDom.hasClass('xblock-jump')).to.be.true;
+            var spy = sinon.spy(linkDom, 'trigger');
+            linkDom.click();
+            spy.calledWithExactly('xblock_jump',[
+                'edX/Open_DemoX',
+                'edx_demo_course',
+                '38751697369040e39ec1d0403efbac96'
+            ]);
+        });
+
+        after(function() {
+            $('.courseware-content').empty();
+        });
+    });
+
     describe('invalid-xblock', function() {
 
         before(function() {
-            $('.courseware-content').xblock({
-                courseId: 'edX/Open_DemoX/edx_demo_course',
-                usageId: 'i4x:;_;_edX;_Open_DemoX;_mentoring;_invalid_xblock',
-                sessionId: '37af0d2122b87150e69fecb8122eebe2',
-                baseDomain: 'localhost',
-                lmsSubDomain: 'lms'
-            });
+            $('.courseware-content').xblock(getDefaultConfig(function(config) {
+                config.usageId = 'i4x:;_;_edX;_Open_DemoX;_mentoring;_invalid_xblock';
+            }));
 
         });
 
@@ -161,12 +214,9 @@ describe('jquery-xblock', function() {
     describe('no-course-id', function() {
 
         before(function() {
-            $('.courseware-content').xblock({
-                usageId: 'i4x:;_;_edX;_Open_DemoX;_mentoring;_d66b5ffbb8a44f93b0b832c1ec25007c',
-                sessionId: '37af0d2122b87150e69fecb8122eebe2',
-                baseDomain: 'localhost',
-                lmsSubDomain: 'lms'
-            });
+            $('.courseware-content').xblock(getDefaultConfig(function(config) {
+                delete config.courseId;
+            }));
         });
 
         it("hasn't loaded any xblock", function() {
@@ -178,10 +228,9 @@ describe('jquery-xblock', function() {
     describe('invalid-sessionid', function() {
 
         before(function() {
-            $('.courseware-content').xblock({
-                courseId: 'edX/Open_DemoX/edx_demo_course',
-                usageId: 'i4x:;_;_edX;_Open_DemoX;_mentoring;_d66b5ffbb8a44f93b0b832c1ec25007c'
-            });
+            $('.courseware-content').xblock(getDefaultConfig(function(config) {
+                delete config.sessionId;
+            }));
         });
 
         it("hasn't loaded any xblock", function() {
