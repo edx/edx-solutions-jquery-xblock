@@ -102,12 +102,3 @@ var XBLOCK_LINKS_ANSWER = {
         ],
     ]
 };
-
-var XBlockData = {
-    getMentoringAnswer: function() {
-        return XBLOCK_MENTORING_ANSWER;
-    },
-    getLinksAnswer: function() {
-        return XBLOCK_LINKS_ANSWER;
-    }
-};

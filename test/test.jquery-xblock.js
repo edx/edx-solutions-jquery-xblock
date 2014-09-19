@@ -5,10 +5,6 @@ describe('jquery-xblock', function() {
     const VALID_MENTORING_USAGE_ID = 'i4x:;_;_edX;_Open_DemoX;_mentoring;_d66b5ffbb8a44f93b0b832c1ec25007c';
     const VALID_LINKS_USAGE_ID = 'i4x:;_;_edX;_Open_DemoX;_mentoring;_399b159119dd4feb87e69800ba2ce113';
 
-    var answer_map = {};
-    answer_map[VALID_MENTORING_USAGE_ID] = XBlockData.getMentoringAnswer;
-    answer_map[VALID_LINKS_USAGE_ID] = XBlockData.getLinksAnswer;
-
     function getDefaultConfig(transform_config){
         var config = {
             courseId: 'edX/Open_DemoX/edx_demo_course',
@@ -20,6 +16,13 @@ describe('jquery-xblock', function() {
         if (transform_config)
             transform_config(config);
         return config;
+    }
+
+    function getAnswerForUsageId(usage_id){
+        if (usage_id === VALID_MENTORING_USAGE_ID)
+            return XBLOCK_MENTORING_ANSWER;
+        else if (usage_id === VALID_LINKS_USAGE_ID)
+            return XBLOCK_LINKS_ANSWER;
     }
 
     before(function() {
@@ -64,8 +67,8 @@ describe('jquery-xblock', function() {
                 deferred.reject();
             }
             else if (options.url.match(/view\/student_view$/)) {
-                var target_answer = usageId ? usageId[0] : VALID_MENTORING_USAGE_ID;
-                deferred.resolveWith(null, [answer_map[target_answer]()]);
+                var target_usage_id = usageId ? usageId[0] : VALID_MENTORING_USAGE_ID;
+                deferred.resolveWith(null, [getAnswerForUsageId(target_usage_id)]);
             }
             else if (options.url.match(/mentoring.js$/)) {
                 $.globalEval(window.__html__['test/fixtures/mentoring.js']);
@@ -168,7 +171,11 @@ describe('jquery-xblock', function() {
             expect(linkDom.hasClass('xblock-jump')).to.be.true;
             var spy = sinon.spy(linkDom, 'trigger');
             linkDom.click();
-            spy.calledWithExactly('xblock_jump',['edX/Open_DemoX', 'edx_demo_course', 'location://edX/Open_DemoX/edx_demo_course/vertical/38751697369040e39ec1d0403efbac96']);
+            spy.calledWithExactly('xblock_jump',[
+                'edX/Open_DemoX',
+                'edx_demo_course',
+                'location://edX/Open_DemoX/edx_demo_course/vertical/38751697369040e39ec1d0403efbac96'
+            ]);
         });
 
         it('should process jump_to_id link', function() {
@@ -177,7 +184,11 @@ describe('jquery-xblock', function() {
             expect(linkDom.hasClass('xblock-jump')).to.be.true;
             var spy = sinon.spy(linkDom, 'trigger');
             linkDom.click();
-            spy.calledWithExactly('xblock_jump',['edX/Open_DemoX', 'edx_demo_course', '38751697369040e39ec1d0403efbac96']);
+            spy.calledWithExactly('xblock_jump',[
+                'edX/Open_DemoX',
+                'edx_demo_course',
+                '38751697369040e39ec1d0403efbac96'
+            ]);
         });
 
         after(function() {
