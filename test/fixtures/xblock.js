@@ -43,7 +43,7 @@ var XBLOCK_MENTORING_ANSWER = {
 
 var XBLOCK_LINKS_ANSWER = {
     "csrf_token": "5H7uQag10YyEpX6gGne1o98fz8zwJYh0",
-    "html": "<div class=\"xblock xblock-student_view xmodule_display xmodule_HtmlModule xblock-initialized\" data-runtime-class=\"LmsRuntime\" data-init=\"XBlockToXModuleShim\" data-block-type=\"html\" data-runtime-version=\"1\" data-usage-id=\"i4x:;_;_TerraCorp;_T101;_html;_3082f5b3cbd74687846619b66b98ae59\" data-type=\"HTMLModule\" data-course-id=\"edX/Open_DemoX/edx_demo_course\">\n<p><a href=\"/courses/edX/Open_DemoX/edx_demo_course/jump_to/location://edX/Open_DemoX/edx_demo_course/vertical/38751697369040e39ec1d0403efbac96\" target=\"[object Object]\">Link to unit 2</a></p>\n<p><a href=\"/courses/edX/Open_DemoX/edx_demo_course/jump_to_id/38751697369040e39ec1d0403efbac96\" target=\"[object Object]\">Link to unit 2 by id</a></p>\n</div>",
+    "html": "<div class=\"xblock xblock-student_view xmodule_display xmodule_HtmlModule xblock-initialized\" data-runtime-class=\"LmsRuntime\" data-init=\"XBlockToXModuleShim\" data-block-type=\"html\" data-runtime-version=\"1\" data-usage-id=\"i4x:;_;_TerraCorp;_T101;_html;_3082f5b3cbd74687846619b66b98ae59\" data-type=\"HTMLModule\" data-course-id=\"edX/Open_DemoX/edx_demo_course\">\n<p><a id=\"jump_to_link\" href=\"/courses/edX/Open_DemoX/edx_demo_course/jump_to/location://edX/Open_DemoX/edx_demo_course/vertical/38751697369040e39ec1d0403efbac96\" target=\"[object Object]\">Link to unit 2</a></p>\n<p><a id=\"jump_to_id_link\" href=\"/courses/edX/Open_DemoX/edx_demo_course/jump_to_id/38751697369040e39ec1d0403efbac96\" target=\"[object Object]\">Link to unit 2 by id</a></p>\n</div>",
     "resources": [
         [
             '1',

@@ -97,7 +97,7 @@ describe('jquery-xblock', function() {
 
     after(function() {
         $.ajax.restore();
-    })
+    });
 
     describe('valid-xblock', function() {
 
@@ -148,6 +148,36 @@ describe('jquery-xblock', function() {
             $('.courseware-content .mentoring .submit .input-main').click();
             expect($.post.called).to.be.true;
             expect($.post.calledWithMatch(/handler\/submit$/)).to.be.true;
+        });
+
+        after(function() {
+            $('.courseware-content').empty();
+        });
+    });
+
+    describe('valid-xblock-links', function() {
+        before(function() {
+            $('.courseware-content').xblock(getDefaultConfig(function(config){
+                config.usageId = VALID_LINKS_USAGE_ID;
+            }));
+        });
+
+        it('should process jump_to link', function() {
+            var linkDom = $('#jump_to_link');
+            expect(linkDom).to.have.length(1);
+            expect(linkDom.hasClass('xblock-jump')).to.be.true;
+            var spy = sinon.spy(linkDom, 'trigger');
+            linkDom.click();
+            spy.calledWithExactly('xblock_jump',['edX/Open_DemoX', 'edx_demo_course', 'location://edX/Open_DemoX/edx_demo_course/vertical/38751697369040e39ec1d0403efbac96']);
+        });
+
+        it('should process jump_to_id link', function() {
+            var linkDom = $('#jump_to_id_link');
+            expect(linkDom).to.have.length(1);
+            expect(linkDom.hasClass('xblock-jump')).to.be.true;
+            var spy = sinon.spy(linkDom, 'trigger');
+            linkDom.click();
+            spy.calledWithExactly('xblock_jump',['edX/Open_DemoX', 'edx_demo_course', '38751697369040e39ec1d0403efbac96']);
         });
 
         after(function() {
