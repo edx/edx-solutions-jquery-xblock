@@ -66,6 +66,21 @@ $('.courseware-content').xblock({
 });
 ```
 
+### Global Options
+
+The global options is used to prioritize options with multiple xblock loading. A XBlock itself can
+use jquery.xblock to load various componments, but they are not aware of the main configuration and
+simply use the useCurrentHost option. In an external application, if we load a xblock with jquery
+xblock with a configuration X, then it's children should use that config too. The above behavior
+will override the following jquery.xblock options:
+
+- sessionId
+- baseDomain
+- lmsSubDomain
+- useCurrentHost
+
+Note that you can also disable that behavior by using the **disableGlobalOptions** setting.
+
 ### Handling events
 
 When a user clicks on a `/jump_to_id` URL, used in courseware content to create links between courseware sections,
@@ -104,3 +119,4 @@ The test environment uses Karma + Chrome.
 #### TODO
 
 - Add Test for useCurrentHost.
+- Add Test for disableGlobalOptions.

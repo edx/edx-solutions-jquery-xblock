@@ -41,9 +41,11 @@
         }
     }
 
+    if (typeof $.xblock !== "undefined")
+        return;
+
     $.xblock = {
         window: window,
-
         location: location,
 
         default_options: {
@@ -54,9 +56,12 @@
                                  // (eg: `example.com`, defaults to current domain)
             lmsSubDomain: 'lms', // The subdomain part for the LMS (eg, `lms` for `lms.example.com`)
             lmsSecureURL: false, // Is the LMS on HTTPS?
-            useCurrentHost: false, // set to true to load xblock using the current location.hostname
+            useCurrentHost: false, // set to true to load xblock using the current location.hostnam
+            disableGlobalOptions: false, // set to true to disable the global_options behavior.
             data: {}              // additional data to send to student_view. send as GET parameters
         },
+
+        global_options: null,
 
         loadResources: function(resources, options, root) {
             var $this = this,
@@ -305,6 +310,23 @@
 
             if (!options.baseDomain) {
                 options.baseDomain = this.location.host;
+            }
+
+            if (!options.disableGlobalOptions) {
+                if (this.global_options == null) {
+                    this.global_options = {
+                        sessionId: options.sessionId,
+                        baseDomain: options.baseDomain,
+                        lmsSubDomain: options.lmsSubDomain,
+                        useCurrentHost: options.useCurrentHost
+                    }
+                } else {
+                    options = $.extend({}, options, this.global_options);
+                    console.log('Forcing the use of sessionId: ' + options.sessionId);
+                    console.log('Forcing the use of baseDomain: ' + options.baseDomain);
+                    console.log('Forcing the use of lmsSubDomain: ' + options.lmsSubDomain);
+                    console.log('Forcing the use of useCurrentHost: ' + options.useCurrentHost);
+                }
             }
 
             return this.init(options, root);
