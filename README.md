@@ -118,5 +118,4 @@ The test environment uses Karma + Chrome.
 
 #### TODO
 
-- Add Test for useCurrentHost.
-- Add Test for disableGlobalOptions.
+...
