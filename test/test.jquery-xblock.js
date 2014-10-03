@@ -11,7 +11,9 @@ describe('jquery-xblock', function() {
             usageId: VALID_MENTORING_USAGE_ID,
             sessionId: '37af0d2122b87150e69fecb8122eebe2',
             baseDomain: 'localhost',
-            lmsSubDomain: 'lms'
+            lmsSubDomain: 'lms',
+            disableGlobalOptions: true,
+            useCurrentHost: false
         };
         if (transform_config)
             transform_config(config);
@@ -235,6 +237,70 @@ describe('jquery-xblock', function() {
 
         it("hasn't loaded any xblock", function() {
             expect($('.courseware-content .xblock')).to.have.length(0)
+        });
+
+    });
+
+    describe('enable-useCurrentHost', function() {
+
+        before(function() {
+            $('.courseware-content').xblock(getDefaultConfig(function(config) {
+                delete config.sessionId;
+                delete config.baseDomain;
+                delete config.lmsSubDomain;
+                config.useCurrentHost = true;
+            }));
+        });
+
+        it("has loaded a xblock", function() {
+            expect($('.courseware-content .xblock')).to.have.length(1);
+        });
+
+    });
+
+    describe('enable-global-options', function() {
+
+        function compare_options(options, current_options) {
+            expect(options.sessionId).to.be.equals(current_options.sessionId);
+            expect(options.baseDomain).to.be.equals(current_options.baseDomain);
+            expect(options.lmsSubDomain).to.be.equals(current_options.lmsSubDomain);
+            expect(options.useCurrentHost).to.be.equals(current_options.useCurrentHost);
+        };
+
+        beforeEach(function() {
+            $('.courseware-content').empty();
+        });
+
+        it("has loaded the first xblock with options", function() {
+
+            expect($.xblock.global_options).to.be.null;
+
+            var current_options = getDefaultConfig(function(config) {
+                config.disableGlobalOptions = false;
+            });
+            $('.courseware-content').xblock(current_options);
+
+            compare_options($.xblock.global_options, current_options);
+            expect($('.courseware-content .xblock')).to.have.length(1);
+        });
+
+        it("has loaded the second xblock without options", function() {
+
+            expect($.xblock.global_options).to.be.a('object');
+
+            sinon.stub($.xblock, 'eventsInit', function(options, root) {
+                compare_options($.xblock.global_options, options);
+            });
+
+            $('.courseware-content').xblock(getDefaultConfig(function(config) {
+                delete config.sessionId;
+                delete config.baseDomain;
+                delete config.lmsSubDomain;
+                config.disableGlobalOptions = false;
+            }));
+
+            $.xblock.eventsInit.restore();
+            expect($('.courseware-content .xblock')).to.have.length(1);
         });
 
     });
