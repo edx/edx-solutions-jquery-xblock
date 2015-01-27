@@ -153,7 +153,7 @@
 
                     return (lmsBaseURL + '/courses/' + courseId + '/xblock/' + usageId +
                             '/handler/' + handlerName);
-                },
+                }
             };
         },
 
@@ -162,23 +162,22 @@
 
             $('.xblock', root).not('.xblock-initialized').each(function(index, blockDOM) {
                 var initFnName = $(blockDOM).data('init');
-                if (!initFnName) {
-                    return;
+                if (initFnName) {
+                    // Don't fail when the page still contains XModules
+                    if (initFnName === 'XBlockToXModuleShim') {
+                        console.log('Warning: Unsupported XModule JS init', blockDOM);
+                        return;
+                    }
+
+                    if (typeof window[initFnName] != 'function') {
+                        console.log('Warning: Undefined init function for XBlock', blockDOM, initFnName);
+                        return;
+                    }
+
+                    console.log('Initializing XBlock JS', initFnName, blockDOM);
+                    window[initFnName]($this.getRuntime(options, root), blockDOM);
                 }
 
-                // Don't fail when the page still contains XModules
-                if (initFnName === 'XBlockToXModuleShim') {
-                    console.log('Warning: Unsupported XModule JS init', blockDOM);
-                    return;
-                }
-
-                if (typeof window[initFnName] != 'function') {
-                    console.log('Warning: Undefined init function for XBlock', blockDOM, initFnName);
-                    return;
-                }
-
-                console.log('Initializing XBlock JS', initFnName, blockDOM);
-                window[initFnName]($this.getRuntime(options, root), blockDOM);
                 $(blockDOM).addClass('xblock-initialized');
             });
         },
