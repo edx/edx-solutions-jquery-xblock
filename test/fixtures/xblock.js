@@ -102,3 +102,9 @@ var XBLOCK_LINKS_ANSWER = {
         ],
     ]
 };
+
+var XBLOCK_NO_INIT_ANSWER = {
+    'csrf_token': "5H7uQag10YyEpX6gGne1o98fz8zwJYh0",
+    'html': "<div class=\"xblock xblock-student_view\" data-course-id=\"edX/Open_DemoX/edx_demo_course\"/>",
+    'resources': []
+}

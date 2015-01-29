@@ -4,6 +4,11 @@ describe('jquery-xblock', function() {
 
     const VALID_MENTORING_USAGE_ID = 'i4x:;_;_edX;_Open_DemoX;_mentoring;_d66b5ffbb8a44f93b0b832c1ec25007c';
     const VALID_LINKS_USAGE_ID = 'i4x:;_;_edX;_Open_DemoX;_mentoring;_399b159119dd4feb87e69800ba2ce113';
+    const VALID_NO_INIT_XBLOCK_USAGE_ID = 'i4x:;_;_edX;_Open_DemoX;_no_init;_12312312312312313123123123123123';
+
+    var validUsageIds = [
+        VALID_MENTORING_USAGE_ID, VALID_LINKS_USAGE_ID, VALID_NO_INIT_XBLOCK_USAGE_ID
+    ];
 
     function getDefaultConfig(transform_config){
         var config = {
@@ -25,6 +30,8 @@ describe('jquery-xblock', function() {
             return XBLOCK_MENTORING_ANSWER;
         else if (usage_id === VALID_LINKS_USAGE_ID)
             return XBLOCK_LINKS_ANSWER;
+        else if (usage_id === VALID_NO_INIT_XBLOCK_USAGE_ID)
+            return XBLOCK_NO_INIT_ANSWER;
     }
 
     before(function() {
@@ -54,7 +61,7 @@ describe('jquery-xblock', function() {
                 var opts = {
                     url: options.url,
                     type: options.type ? options.type : 'GET'
-                }
+                };
 
                 req.open(opts.type, opts.url);
                 ajaxOptions.beforeSend(req, opts);
@@ -64,7 +71,7 @@ describe('jquery-xblock', function() {
                 deferred.reject();
             }
             // simulate a bad usageId
-            else if (usageId && usageId[0] !== VALID_MENTORING_USAGE_ID && usageId[0] !== VALID_LINKS_USAGE_ID) {
+            else if (usageId && $.inArray(usageId[0], validUsageIds) == -1) {
                 // TODO: this doesn't seem to call the fail callback...
                 deferred.reject();
             }
@@ -93,7 +100,7 @@ describe('jquery-xblock', function() {
 
         sinon.stub($, 'post', function(options) {
             var deferred =  new $.Deferred();
-            var promise = deferred.promise()
+            var promise = deferred.promise();
             deferred.resolve({});
 
             return promise;
@@ -211,6 +218,22 @@ describe('jquery-xblock', function() {
             expect($('.courseware-content .xblock')).to.have.length(0);
         });
 
+    });
+
+    describe("xblock-no-init", function(){
+        before(function() {
+            $('.courseware-content').xblock(getDefaultConfig(function(config) {
+                config.usageId = VALID_NO_INIT_XBLOCK_USAGE_ID;
+            }));
+        });
+
+        it("should treat xblock with no init as initialized", function(){
+            expect($('.courseware-content .xblock').hasClass('xblock-initialized')).to.be.true;
+        });
+
+        after(function() {
+            $('.courseware-content').empty();
+        });
     });
 
     describe('no-course-id', function() {
