@@ -275,6 +275,7 @@
                 url: blockURL,
                 dataType: 'json',
                 data: options.data,
+                cache: false,
                 xhrFields: {
                     withCredentials: true
                 }
