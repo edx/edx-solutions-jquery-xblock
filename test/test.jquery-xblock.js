@@ -168,6 +168,14 @@ describe('jquery-xblock', function() {
     });
 
     describe('valid-xblock-links', function() {
+        function checkLink(linkDOM, expected_event_parameters) {
+            expect(linkDOM).to.have.length(1);
+            var spy = sinon.spy($.prototype, 'trigger');
+            linkDOM.click();
+            expect(spy.calledWithExactly('xblock_jump', expected_event_parameters)).to.be.true;
+            spy.restore();
+        }
+
         before(function() {
             $('.courseware-content').xblock(getDefaultConfig(function(config){
                 config.usageId = VALID_LINKS_USAGE_ID;
@@ -176,11 +184,7 @@ describe('jquery-xblock', function() {
 
         it('should process jump_to link', function() {
             var linkDom = $('#jump_to_link');
-            expect(linkDom).to.have.length(1);
-            expect(linkDom.hasClass('xblock-jump')).to.be.true;
-            var spy = sinon.spy(linkDom, 'trigger');
-            linkDom.click();
-            spy.calledWithExactly('xblock_jump',[
+            checkLink(linkDom, [
                 'edX/Open_DemoX',
                 'edx_demo_course',
                 'location://edX/Open_DemoX/edx_demo_course/vertical/38751697369040e39ec1d0403efbac96'
@@ -189,14 +193,34 @@ describe('jquery-xblock', function() {
 
         it('should process jump_to_id link', function() {
             var linkDom = $('#jump_to_id_link');
-            expect(linkDom).to.have.length(1);
-            expect(linkDom.hasClass('xblock-jump')).to.be.true;
-            var spy = sinon.spy(linkDom, 'trigger');
-            linkDom.click();
-            spy.calledWithExactly('xblock_jump',[
+            checkLink(linkDom, [
                 'edX/Open_DemoX',
                 'edx_demo_course',
                 '38751697369040e39ec1d0403efbac96'
+            ]);
+        });
+
+        it('should process dynamically added jump_to links', function(){
+            var href = "/courses/edX/Other_CourseX/edx_other_course/jump_to/location://edX/Other_CourseX/edx_other_course/vertical/1234567890abcdef1234567890abcdef";
+            var linkDom = $("<a id='dynamic_jump_to_link'>Another Link to unit 2</a>");
+            linkDom.attr('href', href);
+            $('.xblock').append(linkDom);
+            checkLink(linkDom, [
+                'edX/Other_CourseX',
+                'edx_other_course',
+                'location://edX/Other_CourseX/edx_other_course/vertical/1234567890abcdef1234567890abcdef'
+            ]);
+        });
+
+        it('should process dynamically added jump_to_id links', function(){
+            var href = "/courses/edX/Other_CourseX/edx_other_course/jump_to_id/1234567890abcdef1234567890abcde";
+            var linkDom = $("<a id='dynamic_jump_to_id_link'>Another Link to unit 2 by id</a>");
+            linkDom.attr('href', href);
+            $('.xblock').append(linkDom);
+            checkLink(linkDom, [
+                'edX/Other_CourseX',
+                'edx_other_course',
+                '1234567890abcdef1234567890abcde'
             ]);
         });
 

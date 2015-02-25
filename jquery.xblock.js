@@ -21,8 +21,10 @@
 //
 
 (function($) {
+    if (typeof $.xblock !== "undefined")
+        return;
 
-    function getLink(linkDom){
+    function getJumpToLink(linkDom) {
         var link_templates = [
             /^\/courses\/([^\/]+\/[^\/]+)\/([^\/]+)\/jump_to\/(.+)/,
             /^\/courses\/([^\/]+\/[^\/]+)\/([^\/]+)\/jump_to_id\/(.+)/
@@ -40,9 +42,6 @@
             }
         }
     }
-
-    if (typeof $.xblock !== "undefined")
-        return;
 
     $.xblock = {
         window: window,
@@ -183,17 +182,12 @@
         },
 
         eventsInit: function(options, root) {
-            // Catch jump_to and jump_to_id URLs
-            $('a', root).not('.xblock-jump').each(function(index, linkDOM) {
-                var link_found = getLink(linkDOM);
-
+            root.on('click', 'a', function(evt) {
+                var link_found = getJumpToLink(this);
                 if (link_found) {
-                    $(linkDOM).on('click', function(e) {
-                        e.preventDefault();
-                        console.log(link_found.course_id, link_found.block_type, link_found.block_id);
-                        $(linkDOM).trigger('xblock_jump', [link_found.course_id, link_found.block_type, link_found.block_id]);
-                    });
-                    $(linkDOM).addClass('xblock-jump');
+                    evt.preventDefault();
+                    console.log(link_found.course_id, link_found.block_type, link_found.block_id);
+                    $(this).trigger('xblock_jump', [link_found.course_id, link_found.block_type, link_found.block_id]);
                 }
             });
         },
