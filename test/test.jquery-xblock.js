@@ -187,7 +187,8 @@ describe('jquery-xblock', function() {
             checkLink(linkDom, [
                 'edX/Open_DemoX',
                 'edx_demo_course',
-                'location://edX/Open_DemoX/edx_demo_course/vertical/38751697369040e39ec1d0403efbac96'
+                'location://edX/Open_DemoX/edx_demo_course/vertical/38751697369040e39ec1d0403efbac96',
+                'jump_to'
             ]);
         });
 
@@ -196,7 +197,8 @@ describe('jquery-xblock', function() {
             checkLink(linkDom, [
                 'edX/Open_DemoX',
                 'edx_demo_course',
-                '38751697369040e39ec1d0403efbac96'
+                '38751697369040e39ec1d0403efbac96',
+                'jump_to_id'
             ]);
         });
 
@@ -208,7 +210,8 @@ describe('jquery-xblock', function() {
             checkLink(linkDom, [
                 'edX/Other_CourseX',
                 'edx_other_course',
-                'location://edX/Other_CourseX/edx_other_course/vertical/1234567890abcdef1234567890abcdef'
+                'location://edX/Other_CourseX/edx_other_course/vertical/1234567890abcdef1234567890abcdef',
+                'jump_to'
             ]);
         });
 
@@ -220,7 +223,8 @@ describe('jquery-xblock', function() {
             checkLink(linkDom, [
                 'edX/Other_CourseX',
                 'edx_other_course',
-                '1234567890abcdef1234567890abcde'
+                '1234567890abcdef1234567890abcde',
+                'jump_to_id'
             ]);
         });
 
