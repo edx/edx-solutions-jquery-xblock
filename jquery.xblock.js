@@ -25,16 +25,18 @@
         return;
 
     function getJumpToLink(linkDom) {
-        var link_templates = [
-            /^\/courses\/([^\/]+\/[^\/]+)\/([^\/]+)\/jump_to\/(.+)/,
-            /^\/courses\/([^\/]+\/[^\/]+)\/([^\/]+)\/jump_to_id\/(.+)/
-        ];
+        var link_templates = {
+            jump_to: /^\/courses\/([^\/]+\/[^\/]+)\/([^\/]+)\/jump_to\/(.+)/,
+            jump_to_id: /^\/courses\/([^\/]+\/[^\/]+)\/([^\/]+)\/jump_to_id\/(.+)/
+        };
         var link_url = $(linkDom).attr('href');
-        for (var i = 0; i < link_templates.length; i++) {
-            var template = link_templates[i];
+        for (var jump_type in link_templates) {
+            if (!link_templates.hasOwnProperty(jump_type)) continue;
+            var template = link_templates[jump_type];
             var match = template.exec(link_url);
             if (match) {
                 return {
+                    jump_type: jump_type,
                     course_id: match[1],
                     block_type: match[2],
                     block_id: match[3]
@@ -187,7 +189,10 @@
                 if (link_found) {
                     evt.preventDefault();
                     console.log(link_found.course_id, link_found.block_type, link_found.block_id);
-                    $(this).trigger('xblock_jump', [link_found.course_id, link_found.block_type, link_found.block_id]);
+                    $(this).trigger(
+                        'xblock_jump',
+                        [link_found.course_id, link_found.block_type, link_found.block_id, link_found.jump_type]
+                    );
                 }
             });
         },
