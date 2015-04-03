@@ -62,6 +62,9 @@
 
         global_options: null,
 
+        // Register events for the runtime to notify with $.xblock.dispatcher.bind('eventname', function).
+        dispatcher: $({}),
+
         loadResources: function(resources, options, root) {
             var $this = this,
                 numResources = resources.length,
@@ -152,6 +155,9 @@
 
                     return (lmsBaseURL + '/courses/' + courseId + '/xblock/' + usageId +
                             '/handler/' + handlerName);
+                },
+                notify: function(name, data) {
+                    $this.dispatcher.trigger(name, data);
                 }
             };
         },
