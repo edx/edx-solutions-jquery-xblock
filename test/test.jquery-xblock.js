@@ -352,4 +352,16 @@ describe('jquery-xblock', function() {
 
     });
 
+    describe('send-runtime-notifications', function() {
+        it("Should send notifications to registered events.", function(done) {
+            $.xblock.dispatcher.bind('test_event', function(event, data) {
+                // Objects are only ever equal to themselves.
+                expect(event.target).to.equal($.xblock.dispatcher[0]);
+                expect(data['test_stuff']).to.equal(5);
+                done();
+            });
+            $.xblock.getRuntime().notify('test_event', {'test_stuff': 5})
+        });
+    });
+
 });
