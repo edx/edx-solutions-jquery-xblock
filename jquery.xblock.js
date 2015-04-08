@@ -64,6 +64,10 @@
 
         global_options: null,
 
+        // JQuery object used to track event listeners. You should use the notify() and listenTo() functions within
+        // the runtime object for compatibility with other runtimes that support notifications.
+        dispatcher: $({}),
+
         loadResources: function(resources, options, root) {
             var $this = this,
                 numResources = resources.length,
@@ -154,6 +158,12 @@
 
                     return (lmsBaseURL + '/courses/' + courseId + '/xblock/' + usageId +
                             '/handler/' + handlerName);
+                },
+                notify: function(name, data) {
+                    $this.dispatcher.trigger(name, data);
+                },
+                listenTo: function(name, callback) {
+                    $this.dispatcher.bind(name, callback);
                 }
             };
         },
