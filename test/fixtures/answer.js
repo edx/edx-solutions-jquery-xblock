@@ -8,5 +8,5 @@ function AnswerBlock(runtime, element) {
                 checkmark.addClass('checkmark-correct icon-ok fa-check');
             }
         }
-    }
+    };
 }
