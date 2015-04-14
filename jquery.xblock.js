@@ -59,7 +59,10 @@
             lmsSecureURL: false, // Is the LMS on HTTPS?
             useCurrentHost: false, // set to true to load xblock using the current location.hostnam
             disableGlobalOptions: false, // set to true to disable the global_options behavior.
-            data: {}              // additional data to send to student_view. send as GET parameters
+            data: {},              // additional data to send to student_view. send as GET parameters
+            rewriter: function (jumpToLink) {} // Function to rewrite jump links if needed for your target platform.
+                                               // See getJumpToLink for details of the object that will be handed to
+                                               // this function.
         },
 
         global_options: null,
@@ -193,18 +196,17 @@
             });
         },
 
-        eventsInit: function(options, root) {
-            root.on('click', 'a', function(evt) {
+        watchLinks: function(options, root) {
+            function jumper(evt) {
                 var link_found = getJumpToLink(this);
                 if (link_found) {
                     evt.preventDefault();
                     console.log(link_found.course_id, link_found.block_type, link_found.block_id);
-                    $(this).trigger(
-                        'xblock_jump',
-                        [link_found.course_id, link_found.block_type, link_found.block_id, link_found.jump_type]
-                    );
+                    var link = $(this);
+                    link.attr('href', (options.rewriter(link_found) || link.attr('href')));
                 }
-            });
+            }
+            root.on('mouseup', 'a', jumper)
         },
 
         csrfSafeMethod: function(method) {
@@ -299,7 +301,7 @@
 
                 $this.loadResources(response.resources, options, root).done(function() {
                     console.log('All XBlock resources successfully loaded');
-                    $this.eventsInit(options, root);
+                    $this.watchLinks(options, root);
                     $this.jsInit(options, root);
                     deferred.resolve();
                 });

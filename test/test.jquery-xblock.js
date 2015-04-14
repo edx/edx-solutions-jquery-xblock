@@ -18,7 +18,8 @@ describe('jquery-xblock', function() {
             baseDomain: 'localhost',
             lmsSubDomain: 'lms',
             disableGlobalOptions: true,
-            useCurrentHost: false
+            useCurrentHost: false,
+            rewriter: sinon.stub()
         };
         if (transform_config)
             transform_config(config);
@@ -168,38 +169,47 @@ describe('jquery-xblock', function() {
     });
 
     describe('valid-xblock-links', function() {
-        function checkLink(linkDOM, expected_event_parameters) {
+        var current_config;
+        var stub;
+        function checkLink(linkDOM, expected, href) {
             expect(linkDOM).to.have.length(1);
-            var spy = sinon.spy($.prototype, 'trigger');
-            linkDOM.click();
-            expect(spy.calledWithExactly('xblock_jump', expected_event_parameters)).to.be.true;
-            spy.restore();
+            linkDOM.mouseup();
+            var args = stub.args[0][0];
+            expect(args).to.eql(expected);
+            expect(linkDOM.attr('href')).to.equal(href);
         }
 
         before(function() {
-            $('.courseware-content').xblock(getDefaultConfig(function(config){
+            current_config = getDefaultConfig(function(config){
                 config.usageId = VALID_LINKS_USAGE_ID;
-            }));
+            });
+            stub = current_config.rewriter;
+            stub.returns('http://changed');
+            $('.courseware-content').xblock(current_config);
+        });
+
+        afterEach(function() {
+            stub.reset();
         });
 
         it('should process jump_to link', function() {
             var linkDom = $('#jump_to_link');
-            checkLink(linkDom, [
-                'edX/Open_DemoX',
-                'edx_demo_course',
-                'location://edX/Open_DemoX/edx_demo_course/vertical/38751697369040e39ec1d0403efbac96',
-                'jump_to'
-            ]);
+            checkLink(linkDom, {
+                jump_type: 'jump_to',
+                course_id: 'edX/Open_DemoX',
+                block_type: 'edx_demo_course',
+                block_id: 'location://edX/Open_DemoX/edx_demo_course/vertical/38751697369040e39ec1d0403efbac96',
+            }, 'http://changed');
         });
 
         it('should process jump_to_id link', function() {
             var linkDom = $('#jump_to_id_link');
-            checkLink(linkDom, [
-                'edX/Open_DemoX',
-                'edx_demo_course',
-                '38751697369040e39ec1d0403efbac96',
-                'jump_to_id'
-            ]);
+            checkLink(linkDom, {
+                jump_type: 'jump_to_id',
+                course_id: 'edX/Open_DemoX',
+                block_type: 'edx_demo_course',
+                block_id: '38751697369040e39ec1d0403efbac96',
+            }, 'http://changed');
         });
 
         it('should process dynamically added jump_to links', function(){
@@ -207,12 +217,13 @@ describe('jquery-xblock', function() {
             var linkDom = $("<a id='dynamic_jump_to_link'>Another Link to unit 2</a>");
             linkDom.attr('href', href);
             $('.xblock').append(linkDom);
-            checkLink(linkDom, [
-                'edX/Other_CourseX',
-                'edx_other_course',
-                'location://edX/Other_CourseX/edx_other_course/vertical/1234567890abcdef1234567890abcdef',
-                'jump_to'
-            ]);
+
+            checkLink(linkDom, {
+                jump_type: 'jump_to',
+                course_id: 'edX/Other_CourseX',
+                block_type: 'edx_other_course',
+                block_id: 'location://edX/Other_CourseX/edx_other_course/vertical/1234567890abcdef1234567890abcdef'
+            }, 'http://changed');
         });
 
         it('should process dynamically added jump_to_id links', function(){
@@ -220,12 +231,12 @@ describe('jquery-xblock', function() {
             var linkDom = $("<a id='dynamic_jump_to_id_link'>Another Link to unit 2 by id</a>");
             linkDom.attr('href', href);
             $('.xblock').append(linkDom);
-            checkLink(linkDom, [
-                'edX/Other_CourseX',
-                'edx_other_course',
-                '1234567890abcdef1234567890abcde',
-                'jump_to_id'
-            ]);
+            checkLink(linkDom, {
+                jump_type: 'jump_to_id',
+                course_id: 'edX/Other_CourseX',
+                block_type: 'edx_other_course',
+                block_id: '1234567890abcdef1234567890abcde',
+            }, 'http://changed');
         });
 
         after(function() {
@@ -339,7 +350,7 @@ describe('jquery-xblock', function() {
 
             expect($.xblock.global_options).to.be.a('object');
 
-            sinon.stub($.xblock, 'eventsInit', function(options, root) {
+            sinon.stub($.xblock, 'watchLinks', function(options, root) {
                 compare_options($.xblock.global_options, options);
             });
 
@@ -350,7 +361,7 @@ describe('jquery-xblock', function() {
                 config.disableGlobalOptions = false;
             }));
 
-            $.xblock.eventsInit.restore();
+            $.xblock.watchLinks.restore();
             expect($('.courseware-content .xblock')).to.have.length(1);
         });
 
