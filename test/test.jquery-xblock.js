@@ -19,7 +19,7 @@ describe('jquery-xblock', function() {
             lmsSubDomain: 'lms',
             disableGlobalOptions: true,
             useCurrentHost: false,
-            rewriter: sinon.stub()
+            jumpLinkRewriter: sinon.stub()
         };
         if (transform_config)
             transform_config(config);
@@ -183,7 +183,7 @@ describe('jquery-xblock', function() {
             current_config = getDefaultConfig(function(config){
                 config.usageId = VALID_LINKS_USAGE_ID;
             });
-            stub = current_config.rewriter;
+            stub = current_config.jumpLinkRewriter;
             stub.returns('http://changed');
             $('.courseware-content').xblock(current_config);
         });
