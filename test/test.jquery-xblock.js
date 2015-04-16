@@ -146,7 +146,7 @@ describe('jquery-xblock', function() {
             expect($('.courseware-content .mentoring .xblock-answer')).to.have.length(1);
         });
 
-        it('called the xblock mentoring and answer init function', function() {
+        it('called the xblock mentoring and answer init functions', function() {
             expect(
                 $('.courseware-content .mentoring .answer-checkmark').hasClass('checkmark-correct')
             ).to.be.true;
@@ -314,8 +314,8 @@ describe('jquery-xblock', function() {
             }));
         });
 
-        it("has loaded a xblock", function() {
-            expect($('.courseware-content .xblock')).to.have.length(1);
+        it("has loaded the xblocks", function() {
+            expect($('.courseware-content .xblock')).to.have.length(3);
         });
 
     });
@@ -333,7 +333,7 @@ describe('jquery-xblock', function() {
             $('.courseware-content').empty();
         });
 
-        it("has loaded the first xblock with options", function() {
+        it("has loaded the xblocks with options", function() {
 
             expect($.xblock.global_options).to.be.null;
 
@@ -343,10 +343,10 @@ describe('jquery-xblock', function() {
             $('.courseware-content').xblock(current_options);
 
             compare_options($.xblock.global_options, current_options);
-            expect($('.courseware-content .xblock')).to.have.length(1);
+            expect($('.courseware-content .xblock')).to.have.length(3);
         });
 
-        it("has loaded the second xblock without options", function() {
+        it("has loaded the xblocks without options", function() {
 
             expect($.xblock.global_options).to.be.a('object');
 
@@ -362,7 +362,7 @@ describe('jquery-xblock', function() {
             }));
 
             $.xblock.watchLinks.restore();
-            expect($('.courseware-content .xblock')).to.have.length(1);
+            expect($('.courseware-content .xblock')).to.have.length(3);
         });
 
     });

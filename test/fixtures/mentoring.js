@@ -1,5 +1,5 @@
 function MentoringBlock(runtime, element) {
-    var children;
+    var children = runtime.children(element);
 
     function callIfExists(obj, fn) {
         if (typeof obj !== 'undefined' && typeof obj[fn] == 'function') {
@@ -9,23 +9,14 @@ function MentoringBlock(runtime, element) {
         }
     }
 
-    function getChildren(element) {
-        if (!_.isUndefined(children))
-            return children;
-
-        var children_dom = $('.xblock-light-child', element);
-        children = [];
-
-        $.each(children_dom, function(index, child_dom) {
-            var child_type = $(child_dom).attr('data-type'),
-                child = window[child_type];
-            if (typeof child !== 'undefined') {
-                child = child(runtime, child_dom);
-                child.name = $(child_dom).attr('name');
-                children.push(child);
+    function initChildren(options) {
+        options = options || {};
+        for (var i=0; i < children.length; i++) {
+            var child = children[i];
+            if (child.type.substr(0,3) == "pb-") {
+                callIfExists(child, 'init', options);
             }
-        });
-        return children;
+        }
     }
 
     function initXBlock() {
@@ -35,10 +26,7 @@ function MentoringBlock(runtime, element) {
             $.post(handlerUrl);
         });
 
-        var children = getChildren(element);
-        _.each(children, function(child) {
-            callIfExists(child, 'init');
-        });
+        initChildren();
     }
 
     initXBlock();

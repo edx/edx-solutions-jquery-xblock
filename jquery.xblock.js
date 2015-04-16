@@ -167,33 +167,62 @@
                 },
                 listenTo: function(name, callback) {
                     $this.dispatcher.bind(name, callback);
+                },
+                children: function(element) {
+                    return $(element).data('xblock-children');
+                },
+                childMap: function(block, childName) {
+                    var children = this.children(block);
+                    for (var i = 0; i < children.length; i++) {
+                        var child = children[i];
+                        if (child.name == childName) {
+                            return child;
+                        }
+                    }
                 }
             };
         },
 
-        jsInit: function(options, root) {
+        initializeXBlocks: function(options, root) {
+            // Find and initialize any XBlocks that are descendants of 'root', and their descendants.
             var $this = this;
+            return $(root).highestDescendants('.xblock:not(.xblock-initialized)').map(function(idx, blockDOM) {
+                return $this.initializeXBlock(options, blockDOM);
+            }).toArray();
+        },
 
-            $('.xblock', root).not('.xblock-initialized').each(function(index, blockDOM) {
-                var initFnName = $(blockDOM).data('init');
-                if (initFnName) {
-                    // Don't fail when the page still contains XModules
-                    if (initFnName === 'XBlockToXModuleShim') {
-                        console.log('Warning: Unsupported XModule JS init', blockDOM);
-                        return;
-                    }
-
-                    if (typeof window[initFnName] != 'function') {
-                        console.log('Warning: Undefined init function for XBlock', blockDOM, initFnName);
-                        return;
-                    }
-
-                    console.log('Initializing XBlock JS', initFnName, blockDOM);
-                    window[initFnName]($this.getRuntime(options, root), blockDOM);
+        initializeXBlock: function(options, blockDOM) {
+            var $this = this;
+            var $blockDOM = $(blockDOM);
+            var blockJS = {};
+            // First, initialize any children:
+            $blockDOM.data('xblock-children', $this.initializeXBlocks(options, blockDOM));
+            // Then initialize this block, if applicable:
+            var initFnName = $blockDOM.data('init');
+            if (initFnName) {
+                // Don't fail when the page still contains XModules
+                if (initFnName === 'XBlockToXModuleShim') {
+                    console.log('Warning: Unsupported XModule JS init', blockDOM);
+                    return;
                 }
 
-                $(blockDOM).addClass('xblock-initialized');
-            });
+                if (typeof window[initFnName] != 'function') {
+                    console.log('Warning: Undefined init function for XBlock', blockDOM, initFnName);
+                    return;
+                }
+
+                console.log('Initializing XBlock JS', initFnName, blockDOM);
+                var runtime = $this.getRuntime(options, blockDOM);
+                var initFn = window[initFnName];
+                blockJS = new initFn(runtime, blockDOM) || {};
+                blockJS.runtime = runtime;
+            }
+
+            blockJS.name = $blockDOM.data('name');
+            blockJS.element = blockDOM;
+            blockJS.type = $blockDOM.data('block-type');
+            $blockDOM.addClass('xblock-initialized');
+            return blockJS;
         },
 
         watchLinks: function(options, root) {
@@ -258,7 +287,7 @@
 
         getViewUrl: function(viewName, options) {
             return (this.getLmsBaseURL(options) + '/courses/' + options.courseId +
-                    '/xblock/' + options.usageId + '/view/' + viewName)
+                    '/xblock/' + options.usageId + '/view/' + viewName);
         },
 
         getCookieOptions: function(options) {
@@ -302,7 +331,7 @@
                 $this.loadResources(response.resources, options, root).done(function() {
                     console.log('All XBlock resources successfully loaded');
                     $this.watchLinks(options, root);
-                    $this.jsInit(options, root);
+                    $this.initializeXBlocks(options, root);
                     deferred.resolve();
                 });
 
@@ -317,7 +346,7 @@
         },
 
         bootstrap: function(options, root) {
-            var options = $.extend({}, this.default_options, options);
+            options = $.extend({}, this.default_options, options);
 
             if (!options.baseDomain) {
                 options.baseDomain = this.location.host;
@@ -330,7 +359,7 @@
                         baseDomain: options.baseDomain,
                         lmsSubDomain: options.lmsSubDomain,
                         useCurrentHost: options.useCurrentHost
-                    }
+                    };
                 } else {
                     options = $.extend({}, options, this.global_options);
                     console.log('Forcing the use of sessionId: ' + options.sessionId);
@@ -347,6 +376,21 @@
     $.fn.xblock = function(options) {
         return this.map(function() {
             return $.xblock.bootstrap(options, $(this));
+        });
+    };
+
+    // Find all the children of an element that match the selector, but only
+    // the first instance found down any path.  For example, we'll find all
+    // the ".xblock" elements below us, but not the ones that are themselves
+    // contained somewhere inside ".xblock" elements.
+    // Code borrowed from edx-platform and edx-sdk
+    $.fn.highestDescendants = function(selector) {
+        return this.children().map(function(idx, element) {
+            if ($(element).is(selector)) {
+                return element;
+            } else {
+                return $(element).highestDescendants(selector).toArray();
+            }
         });
     };
 
