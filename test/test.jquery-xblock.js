@@ -168,6 +168,20 @@ describe('jquery-xblock', function() {
         });
     });
 
+    describe('activate_child_id', function() {
+        before(function() {
+            sinon.stub($.xblock, 'get_querystring', function () {
+                return '?activate=test_block_id';
+            });
+            $('.courseware-content').xblock(getDefaultConfig());
+        });
+
+        it('calls activation on target children', function() {
+            expect($.ajax.getCall(0).args[0]['data']['activate_block_id']).to.equal('test_block_id')
+        });
+
+    });
+
     describe('valid-xblock-links', function() {
         var current_config;
         var stub;
