@@ -299,10 +299,29 @@
             return cookieOptions;
         },
 
+        get_querystring: function(){
+            // For easier test stubbing.
+            return location.search;
+        },
+
         init: function(options, root) {
             var $this = this,
                 deferred = $.Deferred(),
-                blockURL = this.getViewUrl('student_view', options);
+                blockURL = this.getViewUrl('student_view', options),
+                data = options.data;
+
+            // http://stackoverflow.com/a/901144/882918
+            function getParameterByName(name) {
+                name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+                var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+                    results = regex.exec($this.get_querystring());
+                return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+            }
+
+            var activateChild = getParameterByName('activate');
+            if (activateChild) {
+                data['activate_block_id'] = activateChild;
+            }
 
             // Set the LMS session cookie on the shared domain to authenticate on the LMS
             if (!options.sessionId && !options.useCurrentHost) {
