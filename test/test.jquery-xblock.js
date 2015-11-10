@@ -78,7 +78,10 @@ describe('jquery-xblock', function() {
             }
             else if (options.url.match(/view\/student_view$/)) {
                 var target_usage_id = usageId ? usageId[0] : VALID_MENTORING_USAGE_ID;
-                deferred.resolveWith(null, [getAnswerForUsageId(target_usage_id)]);
+                deferred.resolve(getAnswerForUsageId(target_usage_id));
+            }
+            else if (options.url.match(/view\/dashboard_view$/)) {
+                deferred.resolve(XBLOCK_CUSTOM_VIEW_ANSWER)
             }
             else if (options.url.match(/mentoring.js$/)) {
                 $.globalEval(window.__html__['test/fixtures/mentoring.js']);
@@ -93,7 +96,7 @@ describe('jquery-xblock', function() {
                  * $.globalEval(). Loaded directly with karma. */
                 deferred.resolve();
             } else if (options.url.match(/testHeader$/)) {
-                deferred.resolveWith(null, [{headers: req.requestHeaders}]);
+                deferred.resolve({headers: req.requestHeaders});
             }
 
             return deferred;
@@ -363,6 +366,18 @@ describe('jquery-xblock', function() {
 
             $.xblock.watchLinks.restore();
             expect($('.courseware-content .xblock')).to.have.length(3);
+        });
+
+        it("has loaded the xblock with custom view", function() {
+            expect($.xblock.global_options).to.be.a('object');
+
+            var current_options = getDefaultConfig(function(config) {
+                config.block_view = 'dashboard_view';
+            });
+            $('.courseware-content').xblock(current_options);
+
+            compare_options($.xblock.global_options, current_options);
+            expect($('.courseware-content .xblock.xblock-dashboard_view')).to.have.length(1);
         });
 
     });

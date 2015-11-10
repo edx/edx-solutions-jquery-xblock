@@ -45,6 +45,11 @@
         }
     }
 
+    function initArgs(element) {
+        var initargs = $(element).find('> .xblock-json-init-args').text();
+        return initargs ? JSON.parse(initargs) : {};
+    }
+
     $.xblock = {
         window: window,
         location: location,
@@ -59,10 +64,11 @@
             lmsSecureURL: false, // Is the LMS on HTTPS?
             useCurrentHost: false, // set to true to load xblock using the current location.hostnam
             disableGlobalOptions: false, // set to true to disable the global_options behavior.
-            data: {},              // additional data to send to student_view. send as GET parameters
-            jumpLinkRewriter: function (jumpToLink) {} // Function to rewrite jump links if needed for your target platform.
-                                               // See getJumpToLink for details of the object that will be handed to
-                                               // this function.
+            data: {},             // additional data to send to student_view. send as GET parameters
+            jumpLinkRewriter: function (jumpToLink) {}, // Function to rewrite jump links if needed for your target platform.
+                                                        // See getJumpToLink for details of the object that will be handed to
+                                                        // this function.
+            block_view: 'student_view'      // block view to load
         },
 
         global_options: null,
@@ -214,7 +220,7 @@
                 console.log('Initializing XBlock JS', initFnName, blockDOM);
                 var runtime = $this.getRuntime(options, blockDOM);
                 var initFn = window[initFnName];
-                blockJS = new initFn(runtime, blockDOM) || {};
+                blockJS = new initFn(runtime, blockDOM, initArgs(blockDOM)) || {};
                 blockJS.runtime = runtime;
             }
 
@@ -254,15 +260,10 @@
                     withCredentials: true,
                 },
                 beforeSend: function(xhr, settings) {
-                    if (!options.useCurrentHost) {
-                        var queryDomain = $('<a>').prop('href', settings.url).prop('hostname'),
-                            lmsDomain = $this.getLmsDomain(options);
+                    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
 
-                        xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
-
-                        if (!$this.csrfSafeMethod(settings.type) && queryDomain === lmsDomain) {
-                            xhr.setRequestHeader("X-CSRFToken", csrftoken);
-                        }
+                    if (!$this.csrfSafeMethod(settings.type)) {
+                        xhr.setRequestHeader("X-CSRFToken", csrftoken);
                     }
                 }
             });
@@ -302,7 +303,7 @@
         init: function(options, root) {
             var $this = this,
                 deferred = $.Deferred(),
-                blockURL = this.getViewUrl('student_view', options);
+                blockURL = this.getViewUrl(options.block_view, options);
 
             // Set the LMS session cookie on the shared domain to authenticate on the LMS
             if (!options.sessionId && !options.useCurrentHost) {
