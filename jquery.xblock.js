@@ -317,6 +317,7 @@
 
             // Avoid failing if the XBlock contains XModules
             window.setup_debug = function(){};
+            $this.toggleSpinner(root, true);
 
             $.ajax({
                 url: blockURL,
@@ -347,6 +348,7 @@
         },
 
         bootstrap: function(options, root) {
+            var $this = this;
             options = $.extend({}, this.default_options, options);
 
             if (!options.baseDomain) {
@@ -370,8 +372,24 @@
                 }
             }
 
-            return this.init(options, root);
+            var initDeferred = this.init(options, root);
+            initDeferred.always(function() {
+                $this.toggleSpinner(root, false);
+            });
+            return initDeferred;
         },
+
+        toggleSpinner: function(root, show) {
+            var spinner_class = "xblock-spinner";
+            if (show) {
+                var spinner = $("<div/>").addClass(spinner_class);
+                var spinner_styling_wrapper = $("<div/>").addClass("spinner-wrapper").appendTo(spinner);
+                spinner_styling_wrapper.append($("<i/>").addClass('fa fa-spin fa-spinner'));
+                root.append(spinner);
+            } else {
+                root.children("."+spinner_class).remove();
+            }
+        }
     };
 
     $.fn.xblock = function(options) {
