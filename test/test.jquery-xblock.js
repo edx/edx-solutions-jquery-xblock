@@ -129,6 +129,10 @@ describe('jquery-xblock', function() {
             expect($.ajax.called).to.be.true;
         });
 
+        it('has passed bookmarks context', function() {
+            expect($.ajax.calledWithMatch({data: {bookmarked: false, username: 'Anonymous'}})).to.be.true;
+        });
+
         it('has the X-Requested-With header for cross origin request', function() {
             $.ajax({
                 url: VALID_MENTORING_USAGE_ID+'/testHeader'

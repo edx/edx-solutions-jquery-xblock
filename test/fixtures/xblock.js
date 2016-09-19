@@ -32,30 +32,30 @@ var XBLOCK_MENTORING_ANSWER = {
     "resources": [
         [
             '1',
-            {
-                "kind": "url",
-                "data": "//localhost:8000/xblock/resource/mentoring/public/js/answer.js",
-                "mimetype": "application/javascript",
-                "placement": "foot"
-            }
+            [
+                "url",
+                "//localhost:8000/xblock/resource/mentoring/public/js/answer.js",
+                "application/javascript",
+                "foot"
+            ]
         ],
         [
             '2',
-            {
-                "kind": "url",
-                "data": "//localhost:8000/xblock/resource/mentoring/public/js/vendor/underscore-min.js",
-                "mimetype": "application/javascript",
-                "placement": "foot"
-            }
+            [
+                "url",
+                "//localhost:8000/xblock/resource/mentoring/public/js/vendor/underscore-min.js",
+                "application/javascript",
+                "foot"
+            ]
         ],
         [
             '3',
-            {
-                "kind": "url",
-                "data": "//localhost:8000/xblock/resource/mentoring/public/js/mentoring.js",
-                "mimetype": "application/javascript",
-                "placement": "foot"
-            }
+            [
+                "url",
+                "//localhost:8000/xblock/resource/mentoring/public/js/mentoring.js",
+                "application/javascript",
+                "foot"
+            ]
         ]
     ]
 };
@@ -81,12 +81,12 @@ var XBLOCK_LINKS_ANSWER = {
     'resources': [
         [
             '1',
-            {
-                "kind": "url",
-                "data": "//localhost:8000/xblock/resource/mentoring/public/js/vendor/underscore-min.js",
-                "mimetype": "application/javascript",
-                "placement": "foot"
-            }
+            [
+                "url",
+                "//localhost:8000/xblock/resource/mentoring/public/js/vendor/underscore-min.js",
+                "application/javascript",
+                "foot"
+            ]
         ],
     ]
 };
