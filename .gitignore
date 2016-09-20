@@ -1,2 +1,9 @@
 node_modules
 coverage
+
+# Mac
+.DS_Store
+._*
+
+# pycharm
+.idea/

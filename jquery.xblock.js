@@ -116,32 +116,32 @@
                 return deferred;
             }
 
-            if (resource.kind === 'url') {
-                resourceURL = resource.data; // By default, the resource url contains the SITENAME
+            if (resource[0] === 'url') {
+                resourceURL = resource[1]; // By default, the resource url contains the SITENAME
 
-                if (!resource.data.match(/^\/\//) && !resource.data.match(/^(http|https):\/\//)) {
-                    resourceURL = this.getLmsBaseURL(options) + resource.data;
+                if (!resource[1].match(/^\/\//) && !resource[1].match(/^(http|https):\/\//)) {
+                    resourceURL = this.getLmsBaseURL(options) + resource[1];
                 }
 
-                if (resource.mimetype === 'text/css') {
+                if (resource[2] === 'text/css') {
                     $('head').append('<link href="' + resourceURL + '" rel="stylesheet" />')
-                } else if (resource.mimetype === 'application/javascript') {
+                } else if (resource[2] === 'application/javascript') {
                     deferred = $.getScript(resourceURL);
                 } else {
-                    console.log('Unknown XBlock resource mimetype', resource.kind);
+                    console.log('Unknown XBlock resource mimetype', resource[2]);
                 }
-            } else if (resource.kind === 'text') {
-                if (resource.mimetype === 'text/css') {
-                    $('head').append('<style type="text/css">' + resource.data + '</style>');
-                } else if (resource.mimetype === 'application/javascript') {
-                    $.globalEval(resource.data);
-                } else if (resource.mimetype === 'text/html') {
-                    $('head').append(resource.data);
+            } else if (resource[0] === 'text') {
+                if (resource[2] === 'text/css') {
+                    $('head').append('<style type="text/css">' + resource[1] + '</style>');
+                } else if (resource[2] === 'application/javascript') {
+                    $.globalEval(resource[1]);
+                } else if (resource[2] === 'text/html') {
+                    $('head').append(resource[1]);
                 } else {
-                    console.log('Unknown XBlock resource mimetype', resource.mimetype);
+                    console.log('Unknown XBlock resource mimetype', resource[2]);
                 }
             } else {
-                console.log('Unknown XBlock resource kind', resource.kind);
+                console.log('Unknown XBlock resource kind', resource[0]);
             }
             return deferred;
         },
@@ -318,11 +318,18 @@
             // Avoid failing if the XBlock contains XModules
             window.setup_debug = function(){};
             $this.toggleSpinner(root, true);
+            var data = options.data;
+            if (('bookmarked' in data) === false) {
+                data.bookmarked = false;
+            }
+            if (('username' in data) === false) {
+                data.username = 'Anonymous';
+            }
 
             $.ajax({
                 url: blockURL,
                 dataType: 'json',
-                data: options.data,
+                data: data,
                 cache: false,
                 xhrFields: {
                     withCredentials: true
@@ -373,9 +380,11 @@
             }
 
             var initDeferred = this.init(options, root);
-            initDeferred.always(function() {
-                $this.toggleSpinner(root, false);
-            });
+            if (typeof initDeferred !== "undefined") {
+                initDeferred.always(function () {
+                    $this.toggleSpinner(root, false);
+                });
+            }
             return initDeferred;
         },
 
